@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Subscription Receipt</title>
+    <style>
+
+        body { font-family: Arial, sans-serif; color: #000; font-size: 14px; }
+        h1, h2, h3, h4 { color:black; margin-bottom: 5px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { padding: 4px 6px; border: 1px solid #ccc; }
+        th { background-color: #f2f2f2; text-align: left; }
+        .section { margin-bottom: 30px; }
+        .footer { margin-top: 40px; text-align: center; font-size: 12px; color: #888; }
+    </style>
+</head>
+<body>
+    <h1 style= "font-size: 30px">Receipt</h1>
+
+    <div class="section" >
+        <h2 style= "font-size: 24px">Wanderlog Ltd</h2>
+        <p>
+            123 Lincoln Road<br>
+            Lincoln, New Zealand
+        </p>
+    </div>
+
+    <div class="section">
+        <h3 style= "font-size: 20px">Invoice Details</h3>
+        <p>
+           
+            <strong>{{subscription_record.first_name}} {{subscription_record.last_name}}</strong><br>
+            Subscription ID: #{{subscription_record.subscription_id}}<br>
+             Created on: {{ subscription_record.created_at.strftime('%d-%b-%Y') }}
+        </p>
+
+        <h4 style= "font-size: 18px">Billing Address</h4>
+        <p>{{subscription_record.billing_address}}</p>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Items</th>
+                <th>Product ID</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>
+                    <strong> Wanderlog Subscription Plan: <br>{{subscription_record.type}} Premium Plan</strong><br>
+                    
+                    <p>{% if subscription_record.is_trial %}
+                        Trial Plan<br>
+                    {% endif %}
+                    {% if subscription_record.discount_percent is not none %}
+                        Discount: {{ subscription_record.discount_percent }}%<br>
+                    {% else %} 
+                    Discount: None <br>
+                    {% endif %}
+                    Start Date: {{subscription_record.start_date.strftime('%d-%b-%Y') }}<br>
+                    Expiry Date: {{subscription_record.end_date.strftime('%d-%b-%Y') }}
+                </td>
+                <td>#{{subscription_record.plan_id}} - {{subscription_record.type}} Premium Plan</td>
+                <td>${{subscription_record.amount}}<br>
+                    {% if subscription_record.gst_included == 'Yes-15%'%}
+                        incl. GST 15% 
+                    {% endif %}
+                </p>
+                </td>
+
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="footer">
+        Thank you for your business<br>
+        For any questions, contact support@wanderlog.com
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,94 @@
+{% extends 'userbase.html' %}
+
+{% block title %}Add Journey{% endblock %}
+
+{% set active_page = 'addjourney' %}
+
+{% block content %}
+
+{% with messages = get_flashed_messages(with_categories=True) %}
+    {% if messages %}
+        {% for category, message in messages %}
+            <div class="container">
+                <div class="alert alert-{{ 'danger' if category == 'error' else category }}" role="alert" id="flashMessage">
+                    {{ message }}
+                </div>
+            </div>
+
+            <script>
+                setTimeout(function() {
+                    var flashMessage = document.getElementById("flashMessage");
+                    if (flashMessage) {
+                        flashMessage.style.display = "none";
+                    }
+                }, 1500);
+            </script>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+
+
+<section class="container py-4 text-left">
+    <div class="row justify-content-center">
+        <div class="col-lg-9 d-flex flex-column">
+            <a href="{{url_for('myjourneys.myjourneys') }}" class="mb-4"> &lt;&lt; Exit</a>
+            <div class=" bg-white p-4 rounded-3">
+
+            <div class="d-flex align-items-center gap-3 mb-0">
+                <h4 class="w-50">Add Journey</h4>
+            </div>
+            <hr />
+            <div class ="containter ">
+            <form method="POST" action="/addjourney">
+                <div class="form-group mb-2">
+                    <label for="title">Title</label>
+                    <input type="text" class="form-control" id="title" name="title" placeholder="Enter a title..." required>
+                </div>
+                <!-- users not allowed to input future dates -->
+                <div class="form-group mb-2">
+                    <label for="start_date">Start Date:</label>
+                    <input type="date" class="form-control" id="start_date" name="start_date" max="{{ current_date }}" placeholder="Enter a date..." required>
+                </div>
+                <div class="form-group mb-2">
+                    <label for="status">Status</label>
+                    <select class="form-control" id="status" name="status" required>
+                            <option value="" disabled selected>Select a status</option>
+                            <option value="public">Public</option>
+                            <option value="private">Private</option>
+                            {% if session['role'] in ['editor','admin'] %}
+                            <option value="hidden">Hidden </option>
+					        {% endif %}
+                    </select>
+                </div>
+                <div class="form-group position-relative mb-2">
+                    <label for="location">Location</label>
+                        <input
+                            list="locations-list"
+                            class="form-control"
+                            id="location"
+                            name="location"
+                            placeholder="Type or select a location"
+                            required
+                        />
+                        <datalist id="locations-list">
+                            <option value="" disabled>Select a location</option>
+                            {% for existing_location in locations %}
+                                <option value="{{ existing_location['location'] }}">{{ existing_location['location'] }}</option>
+                            {% endfor %}
+                        </datalist>
+                </div>
+                <div class="form-group mb-2">
+                    <label for="description">Description</label>
+                    <textarea type="text" class="form-control" rows="5" id="description" name="description" placeholder="Enter a decription..." required></textarea>
+                </div>
+
+                <button class="btn btn-primary" style="margin-top: 20px;">Submit Journey</button>
+            </form>
+            
+        </div>
+    </div>
+    
+</section>
+
+
+{% endblock %}

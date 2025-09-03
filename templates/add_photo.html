@@ -1,0 +1,25 @@
+{% extends "userbase.html" %}
+
+{% block title %}Add Photo to Event{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Add Photo to "{{ event['title'] }}"</h1>
+    <p class="text-muted">Journey: {{ journey_title }}</p>
+    
+    <div class="alert alert-info">
+        <i class="bi bi-info-circle"></i> You can add one photo per event. The maximum file size is 5MB.
+    </div>
+    
+    <form method="POST" action="{{ url_for('myjourneys.add_photo', event_id=event['event_id']) }}" enctype="multipart/form-data">
+        <div class="mb-3">
+            <label for="photo" class="form-label">Select Photo</label>
+            <input type="file" class="form-control" id="photo" name="photo" accept="image/*" required>
+            <div class="form-text">Allowed formats: JPG, PNG, GIF</div>
+        </div>
+        
+        <button type="submit" class="btn btn-primary">Upload Photo</button>
+        <a href="{{ url_for('myjourneys.view_journey', journey_id=event['journey_id']) }}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %} 

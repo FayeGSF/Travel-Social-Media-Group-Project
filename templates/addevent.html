@@ -1,0 +1,91 @@
+{% extends "userbase.html" %}
+
+{% block title %}Add Event{% endblock %}
+
+{% block content %}
+<!-- Flash message -->
+{% with messages = get_flashed_messages(with_categories=True) %}
+{% if messages %}
+    {% for category, message in messages %}
+        <div class="container alert alert-{{ category }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
+{% endif %}
+{% endwith %}
+<div class="container d-flex justify-content-center mt-4">
+    <div class="d-flex flex-column col-lg-9">
+        <a href="{{ url_for('myjourneys.view_journey', journey_id=journey.journey_id) }}" class=""> &lt;&lt; Exit</a>
+        <div class="bg-white  p-4 rounded-4 mt-4">
+            <h4>Add Event to "{{ journey['title'] }}"</h4>
+            <form method="POST" action="{{ url_for('myjourneys.add_event', journey_id=journey['journey_id']) }}">
+                <div class="mb-3">
+                    <label for="title" class="form-label">Event Title*</label>
+                    <input type="text" class="form-control" id="title" name="title" value="{{ form_data.title if form_data else '' }}" required>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="location" class="form-label">Location*</label>
+                    <input
+                        list="locations-list"
+                        class="form-control"
+                        id="location"
+                        name="location"
+                        value="{{ form_data.location if form_data else '' }}"
+                        placeholder="Type or select a location"
+                        required
+                    />
+                    <datalist id="locations-list">
+                        {% for existing_location in locations %}
+                            <option value="{{ existing_location['location'] }}"></option>
+                        {% endfor %}
+                    </datalist>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="description" class="form-label">Description</label>
+                    <textarea class="form-control" id="description" name="description" rows="3">{{ form_data.description if form_data else '' }}</textarea>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="start_date" class="form-label">Start Date*</label>
+                        <input type="date" class="form-control" id="start_date" name="start_date" 
+                               value="{{ form_data.start_date if form_data else '' }}" 
+                               max="{{ current_date }}"
+                               required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="start_time" class="form-label">Start Time (Optional)</label>
+                        <input type="time" class="form-control" id="start_time" name="start_time" 
+                               value="{{ form_data.start_time if form_data else '00:00' }}">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="end_date" class="form-label">End Date (Optional)</label>
+                        <input type="date" class="form-control" id="end_date" name="end_date" 
+                               value="{{ form_data.end_date if form_data else '' }}"
+                               max="{{ current_date }}">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="end_time" class="form-label">End Time (Optional)</label>
+                        <input type="time" class="form-control" id="end_time" name="end_time" 
+                               value="{{ form_data.end_time if form_data else '00:00' }}">
+                        <small class="form-text text-muted">Leave blank if it's a single-moment event</small>
+                    </div>
+                </div>
+                
+                <div class="mb-3 form-text">
+                    * Required fields
+                </div>
+                
+                <button type="submit" class="btn btn-primary">Add Event</button>
+                <a href="{{ url_for('myjourneys.view_journey', journey_id=journey['journey_id']) }}" class="btn btn-secondary">Cancel</a>
+            </form>
+        </div>
+    </div>
+    
+</div>
+{% endblock %} 

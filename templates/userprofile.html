@@ -1,0 +1,448 @@
+{% extends 'userbase.html' %}
+
+{% block title %}User Profile{% endblock %}
+
+{# Set the active page to be highlighted in the navigation bar. #}
+{% set active_page = 'userprofile' %}
+
+{% block content %}
+ 
+{% with messages = get_flashed_messages(with_categories=True) %}
+{% if messages %}
+    {% for category, message in messages %}
+        <div class="container alert alert-{{ category }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
+{% endif %}
+{% endwith %}
+<section class="container d-flex flex-column align-items-center py-3">
+    <div class="col-lg-8">
+        <div class="text-start">
+            <a href="{{url_for('users.homepage') }}" class=""> &lt;&lt; Exit</a>
+        </div>
+    
+        <div class="bg-white d-flex flex-column align-items-center p-5 rounded-4 mt-4">
+            
+            <div class="container">
+                <!-- Profile image -->
+                <div class="d-flex justify-content-center">
+                    <img src="{{ profile.profile_image}}" alt="Profile Image" class="rounded-circle" style="width: 80px; height: 80px; object-fit: cover; margin-right: 20px;">
+                </div>
+                <div id="" class=" text-center">
+                    <h1 class="mb-0 mt-3">{{ profile.username }}'s Profile</h1>
+                </div>
+
+                <div id="pictureSection" class="text-center d-none mt-0 ">
+                    {% if profile.profile_image =="static/images/profileplaceholder.png" %}
+                    {% else %}
+                            <form action="{{ url_for('profile.remove_image', from='profile') }}" method="POST" style="display:inline;">
+                                <input type="hidden" name="form_type" value="remove_image">
+                                <button type="submit" class="btn btn-link text-primary">>> Remove Image</button>
+                            </form>
+                    {% endif %}
+                </div>
+
+                <!-- <div id="pictureSection" class="text-center d-none mt-0 ">
+                    <form action="{{ url_for('profile.remove_image', from='userprofile', userid=profile.userid) }}" method="POST" style="display:inline;">
+                        <input type="hidden" name="form_type" value="remove_image">
+                        <button type="submit" class="btn btn-link text-primary">>> Remove Image</button>
+                    </form>
+                </div> -->
+            </div>
+            
+            <div class="container mt-5">
+                <form  id="profileForm" action="{{ url_for('users.edit_profile') }}" method="post" enctype="multipart/form-data">
+                    <input type="hidden" id="user_id" name="user_id" value="{{ profile.userid }}">
+                    <div class="row justify-content-center">
+                        <div class="col-lg-4 mb-3">
+                            <label for="username" class="form-label">Username</label>
+                            <input required type="text" class="form-control{% if username_error %} is-invalid{% endif %}" id="username" name="username" value="{{ profile.username }}" disabled>
+                            <div id="username_error" class="invalid-feedback">{{ username_error }}</div>
+                        </div>
+                        <div class="col-lg-4 mb-3">
+                            <label for="useremail" class="form-label">Email</label>
+                            <input required type="email" class="form-control" id="email" name="useremail" value="{{ profile.email }}" disabled>
+                            <div id="email_error" class="invalid-feedback">{{ email_error }}</div>
+                        </div>
+                    </div>
+                    <div class="row justify-content-center">
+                        <div class="col-lg-4 mb-3">
+                            <label for="first_name" class="form-label">First Name</label>
+                            <input required type="text" class="form-control" id="first_name" name="first_name" value="{{ profile.first_name }}" disabled>
+                        </div>
+                        <div class="col-lg-4 mb-3">
+                            <label for="last_name" class="form-label">Last Name</label>
+                            <input required type="text" class="form-control" id="last_name" name="last_name" value="{{ profile.last_name }}" disabled>
+                        </div>
+                    </div>
+                    <div class="row justify-content-center ">
+                        <div class="col-lg-4 mb-3">
+                            <label for="location" class="form-label">Location</label>
+                            <input type="text" class="form-control" id="location" name="location" value="{{ profile.location }}" disabled>
+                        </div>
+                        <!-- <div class="row justify-content-center"> -->
+                            <!-- <input type="hidden" name="form_type" value="profile"> -->
+                        <div class="col-lg-4 mb-3">
+                            <label for="description" class="form-label">Description</label>
+                            <input required type="text" class="form-control{% if description_error %} is-invalid{% endif %}" id="description" name="description" value="{{ profile.description }}" disabled>
+                            <div id="description_error" class="invalid-feedback">{{ description_error }}</div>
+                        </div>
+                        <!-- </div> -->
+                        <!-- <div class="col-lg-4">
+                            <label for="profile_picture" class="form-label">Upload Profile Picture</label>
+                            <input type="file" class="form-control" id="profile_picture" name="profile_picture" accept="image/*" disabled >
+                        </div> -->
+                    </div>
+                    <!-- <div class="row d-flex flex-column ">
+                        <div class="col-lg-4 offset-lg-2 mb-3">
+                            <label for="profile_picture" class="form-label">Profile Picture</label>
+                            <input type="file" class="form-control" id="profile_picture" name="profile_picture" accept="image/*" disabled>
+                        </div>
+                        <div class="col-lg-4 offset-lg-2 mb-3  ">
+                            <a href=""> >> Remove Image</a>
+                        </div>
+                    </div> -->
+    
+                    <div class="my-3 row justify-content-center">
+                        <div class="col-lg-8">
+                            <!-- <hr /> -->
+                            <div class="d-flex">
+                                <button type="button" id="editButton" class="btn btn-primary w-100" onclick="enableEdit()">Edit</button>
+                                <button type="button" id="cancelButton" class="btn btn-secondary w-50" onclick="cancelEdit()" style="display: none;">Cancel</button>
+                                <button type="submit" id="submitButton" class="btn btn-primary w-50" style="display: none; margin-left: 2%;">Submit</button>
+                               
+                                <!-- <button type="button" id="passButton" class="btn btn-light border-primary text-primary" onclick="removeImage(event)">Remove Image</button> -->
+        
+                            </div>
+                            
+                        </div>
+                    </div>
+                </form>
+    
+                
+            </div>
+            <!-- <div>
+                <a style=" margin-left: auto;" class="nav-link{{ ' active' if active_page == 'usermanagement' else '' }}" href="{{ url_for('profile.changepassword') }}">
+                    <div type="button" id="passButton" class="text-primary text-decoration-underline"  > >> Change Password</div>
+                </a>
+            </div> -->
+        </div>
+    </div>
+    <div class="col-12 col-lg-8 bg-white p-5 mt-5 rounded-4">
+        <div class="row">
+            <div class="dropdown col-12 col-lg-6 mb-3">
+                <label for="status" class="form-label d-block">Set Status</label>
+                {% if profile.role=='admin' %}
+                <button class="btn w-100 btn-secondary opacity-30 " type="button" id="statusDropdown" data-bs-toggle="dropdown" aria-expanded="false" disabled>
+                    <i class="bi bi-lock me-1"></i> Not editable                
+                </button>
+                {% else %}
+                <button class="btn dropdown-toggle btn-outline-primary w-100 " type="button" id="statusDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    {{ selected_status|capitalize }}
+                </button>
+                {% endif %}
+                <ul class="dropdown-menu" aria-labelledby="statusDropdown">
+                    <li><a class="dropdown-item" href="#" onclick="changestatus('active')">Active</a></li>
+                    <li><a class="dropdown-item" href="#" onclick="changestatus('blocked')">Blocked</a></li>
+                    <li><a class="dropdown-item" href="#" onclick="changestatus('banned')">Banned</a></li>
+                </ul>
+            </div>
+            <div class="dropdown col-12 col-lg-6  mb-3">
+                <label for="role" class="form-label d-block">Set Role</label>
+                
+                {% if profile.role=='admin' %}
+                <button class="btn w-100 btn-secondary opacity-30"  type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false" disabled>
+                    <i class="bi bi-lock me-1"></i> Not editable                
+                </button>
+                {% else %}
+                <button class="btn dropdown-toggle btn-outline-primary w-100"  type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                    {{ selected_value|capitalize }}
+                </button>
+                {% endif %}
+
+                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    <li><a class="dropdown-item" href="#" onclick="changerole('traveller')">Traveller</a></li>
+                    <li><a class="dropdown-item" href="#" onclick="changerole('editor')">Editor</a></li>
+                    <li><a class="dropdown-item" href="#" onclick="changerole('admin')">Admin</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="mb-4 mt-3">
+            <label for="role" class="form-label ">Action History:</label>
+        
+            {% if profile.action_history %}
+                <ul class="list-group">
+                    {% for record in profile.action_history.split(',') %}
+                        <li class="list-group-item py-2 px-3">
+                            {{ record.strip() }}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="text-muted fst-italic">No history available.</p>
+            {% endif %}
+        </div>
+        
+
+    </div>
+    <!-- <div class="row ">
+        <div class="col-lg-6 bg-white p-5 rounded-3">
+            <div class="row justify-content-center text-center w-100">
+                <div class="col-lg-12 d-flex align-items-center justify-content-center mb-4">
+                    <img src="{{ profile.profile_image }}" alt="Profile Image" class="rounded-circle" style="width: 80px; height: 80px; object-fit: cover; margin-right: 20px;">
+
+                    <div class="col-lg-7">
+                        <div class="d-flex align-items-center gap-3 w-200">
+                            <h2 style="padding-right: 20px;" class="w-100">{{ profile.username }}'s Profile</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row justify-content-center">
+                <div class="col-lg-6 mb-3">
+                    <label for="username" class="form-label">Username</label>
+                    <input type="text" class="form-control" id="username" name="username" value="{{ profile.username }}" disabled>
+                </div>
+                <div class="col-lg-6 mb-3">
+                    <label for="useremail" class="form-label">Email</label>
+                    <input type="text" class="form-control" id="useremail" name="useremail" value="{{ profile.email }}" disabled>
+                </div>
+            </div>
+            <div class="row justify-content-center">
+                <div class="col-lg-6 mb-3">
+                    <label for="first_name" class="form-label">First Name</label>
+                    <input type="text" class="form-control" id="first_name" name="first_name" value="{{ profile.first_name }}" disabled>
+                </div>
+                <div class="col-lg-6 mb-3">
+                    <label for="last_name" class="form-label">Last Name</label>
+                    <input type="text" class="form-control" id="last_name" name="last_name" value="{{ profile.last_name }}" disabled>
+                </div>
+            </div>
+            <div class="row justify-content-center">
+                <div class="col-lg-6 mb-3">
+                    <label for="location" class="form-label">Location</label>
+                    <input type="text" class="form-control" id="location" name="location" value="{{ profile.location }}" disabled>
+                </div>
+            </div>
+            
+        </div>
+
+        <div class="col-lg-6 mb-5">
+            First Row
+            <div class="row mt-5">
+                <div class="col-lg-6 mb-3 mt-5">
+                    
+                </div>
+                <div class="col-lg-6 mb-3 mt-5">
+                    
+                </div>
+            </div>
+
+            Second Row
+            <div class="row">
+                <div class="col-lg-6 mb-3">
+                    <label for="extra3" class="form-label">Extra Field 3</label>
+                    <input type="text" class="form-control" id="extra3" placeholder="Extra Data 3">
+                </div>
+                <div class="col-lg-6 mb-3">
+                    <label for="extra4" class="form-label">Extra Field 4</label>
+                    <input type="text" class="form-control" id="extra4" placeholder="Extra Data 4">
+                </div>
+            </div>
+        </div>
+    </div> -->
+
+
+</section>
+
+<script>
+    let userid = "{{ profile.userid }}";
+    let role = "{{ selected_value }}"; 
+    let status = "{{ selected_status }}"; 
+
+    // Function to change the role of the user
+    function changerole(newrole) {
+        window.location.href = "/userprofile?userid=" + userid + "&role=" + newrole;
+    }
+
+    // Function to change the status of the user
+    function changestatus(newstatus) {
+        window.location.href = "/userprofile?userid=" + userid + "&status=" + newstatus;
+    }
+    
+    function removeImage(event) {
+     event.preventDefault();  // Prevent the form submission
+     fetch("/remove_image",  {
+         method: 'POST',
+         headers: {'Content-Type': 'application/json'},
+         body: JSON.stringify({form_type: 'remove_image'})
+     })
+     .then(response => {
+         if (response.ok) {
+             window.location.href = "/profile";
+         } else {
+             console.error('Failed to remove image');
+         }
+     })
+     .catch(error => console.error('Error:', error));
+ }
+ 
+ 
+     // to store the original values
+     let originalValues = {};
+ 
+     // Function to make the fields in the form editable
+     function enableEdit() {
+         const form = document.getElementById("profileForm");
+         const inputs = form.querySelectorAll("input:not([type='hidden'])");
+ 
+         // Storing original values before editing
+         inputs.forEach(input => {
+             originalValues[input.id] = input.value;
+             input.disabled = false;
+         });
+         
+         document.getElementById("pictureSection").classList.remove("d-none");
+ 
+         // Showing the submit and cancel buttons, while hiding the edit button
+         document.getElementById("editButton").style.display = "none";
+         document.getElementById("submitButton").style.display = "inline-block";
+         document.getElementById("cancelButton").style.display = "inline-block";
+     }
+ 
+     // Function to make the fields in the form uneditable and replace with original values
+     function cancelEdit() {
+         const form = document.getElementById("profileForm");
+         const inputs = form.querySelectorAll("input:not([type='hidden'])");
+ 
+         // Restoring the original values
+         inputs.forEach(input => {
+             if (originalValues.hasOwnProperty(input.id)) {
+                 input.value = originalValues[input.id];
+             }
+             input.disabled = true;
+         });
+ 
+         document.getElementById("pictureSection").classList.add("d-none");
+ 
+         // Hiding the submit and cancel buttons, while showing the edit button
+         document.getElementById("editButton").style.display = "inline-block";
+         document.getElementById("submitButton").style.display = "none";
+         document.getElementById("cancelButton").style.display = "none";
+ 
+     }
+</script>
+<script defer>
+     // Function to check if the username entered is already taken
+     document.addEventListener("DOMContentLoaded", function() {
+         // Getting the username value from the form
+         let usernameField = document.getElementById("username");
+         let emailField = document.getElementById("email");
+         let emailError = document.getElementById("email_error");
+         let usernameError = document.getElementById("username_error");
+         let currentUsername = "{{ profile.username }}";  
+         let currentEmail = "{{ profile.email }}";  
+ 
+         if (usernameField) {
+             usernameField.addEventListener("input", function() {
+                 let username = this.value.trim();
+ 
+                 // checking if the username field is empty
+                 if (username === "") {
+                     usernameError.textContent = "";
+                     usernameError.style.color = "";  
+                     this.classList.remove("is-invalid", "is-valid");
+                     return;
+                 }
+ 
+                 // Checking if the entered username is the same as the user's current
+                 // username
+                 if (username === currentUsername) {
+                     usernameError.textContent = "Current Username";
+                     usernameError.style.color = "green";
+                     this.classList.remove("is-invalid");
+                     this.classList.add("is-valid");
+                     return;
+                 }
+ 
+                 // AJAX request to frontend to check if the new username is unique
+                 fetch("/check-username", {
+                     method: "POST",
+                     headers: { "Content-Type": "application/json" },
+                     body: JSON.stringify({ username: username }),
+                 })
+                 .then(response => response.json())
+                 .then(data => {
+                     if (data.is_unique) {
+                         usernameError.textContent = "";
+                         usernameError.style.color = "";  
+                         this.classList.remove("is-invalid");
+                         this.classList.add("is-valid");
+                     } else {
+                         usernameError.textContent = "Username is already taken.";
+                         usernameError.style.color = "red";
+                         this.classList.add("is-invalid");
+                         this.classList.remove("is-valid");
+                     }
+                 })
+                 .catch(error => console.error("Error:", error));
+             });
+         }
+         if (emailField) {
+             emailField.addEventListener("input", function() {
+                 let email = this.value.trim();
+                 let emailError = document.getElementById("email_error");
+     
+                 if (email === "") {
+                     emailError.textContent = "";
+                     this.classList.remove("is-invalid");
+                     return;
+                 }
+ 
+                 // Checking if the entered email is the same as the user's current
+                 // email
+                 if (email === currentEmail) {
+                     emailError.textContent = "Current Email";
+                     emailError.style.color = "green";
+                     this.classList.remove("is-invalid");
+                     this.classList.add("is-valid");
+                     return;
+                 }
+ 
+                 // AJAX request to access backend function to check if
+                 // email is unique
+     
+                 fetch("/check-email", {
+                     method: "POST",
+                     headers: { "Content-Type": "application/json" },
+                     body: JSON.stringify({ email: email }),
+                 })
+                 .then(response => response.json())
+                 .then(data => {
+                     if (data.is_unique) {
+                         emailError.textContent = "";
+                         this.classList.remove("is-invalid");
+                         this.classList.add("is-valid");
+                     } else {
+                         emailError.textContent = "Email is already taken.";
+                         this.classList.add("is-invalid");
+                     }
+                 })
+                 .catch(error => console.error("Error:", error));
+             });
+         }
+     });
+
+     setTimeout(function() {
+            let alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                let bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            });
+        }, 1500);
+</script>
+
+{% endblock %}
